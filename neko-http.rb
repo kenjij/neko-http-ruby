@@ -1,6 +1,6 @@
 # NekoHTTP - Pure Ruby HTTP client using net/http
 # 
-# v.20190829
+# v.20200423
 
 require 'net/http'
 require 'openssl'
@@ -98,6 +98,10 @@ module Neko
         end
       else
         return nil
+      end
+      if uri.userinfo
+        req.basic_auth(uri.user, uri.password)
+        logger.info('Created basic auth header from URL')
       end
       data = send(req)
       data = redirect(method, uri, params: params, body: body, query: query) if data.class <= URI::HTTP
