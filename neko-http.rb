@@ -1,6 +1,6 @@
 # NekoHTTP - Pure Ruby HTTP client using net/http
 # 
-# v.20200424
+# v.20200430
 
 require 'json'
 require 'logger'
@@ -105,7 +105,7 @@ module Neko
           query = URI.encode_www_form(params)
           logger.info('Created urlencoded query from params')
         end
-        uri.query = query
+        uri.query = query if query
         req = METHOD_HTTP_CLASS[method].new(uri)
       when :put, :patch, :post
         uri.query = query if query
