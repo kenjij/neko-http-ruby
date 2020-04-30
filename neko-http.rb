@@ -1,10 +1,11 @@
 # NekoHTTP - Pure Ruby HTTP client using net/http
 # 
-# v.20200423
+# v.20200424
 
+require 'json'
+require 'logger'
 require 'net/http'
 require 'openssl'
-require 'logger'
 
 module Neko
   def self.logger=(logger)
@@ -38,6 +39,25 @@ module Neko
       return data
     end
 
+    # Send POST request with JSON body
+    # It will set the Content-Type to application/json.
+    # @param url [String] full URL string
+    # @param obj [Array, Hash, String] Array/Hash will be converted to JSON
+    def self.post_json(url, obj)
+      h = HTTP.new(url, {'Content-Type' => 'application/json'})
+      case obj
+      when Array, Hash
+        body = JSON.fast_generate(obj)
+      when String
+        body = obj
+      else
+        raise ArgumentError, 'Argument is neither Array, Hash, String'
+      end
+      data = h.post(body: body)
+      h.close
+      return data
+    end
+
     attr_reader :init_uri, :http
     attr_accessor :logger, :headers
 
@@ -48,7 +68,7 @@ module Neko
       @http = Net::HTTP.new(init_uri.host, init_uri.port)
       http.use_ssl = init_uri.scheme == 'https'
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      self.headers = hdrs
+      @headers = hdrs
     end
 
     def get(path: nil, params: nil, query: nil)
@@ -129,9 +149,7 @@ module Neko
 
     def inject_headers_to(req)
       return if headers.nil?
-      headers.each do |k, v|
-        req[k] = v
-      end
+      headers.each { |k, v| req[k] = v }
       logger.info('Header injected into HTTP request header')
     end
 
