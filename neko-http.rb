@@ -1,6 +1,6 @@
 # NekoHTTP - Pure Ruby HTTP client using net/http
 # 
-# v.20200430
+# v.20200430r
 
 require 'json'
 require 'logger'
@@ -124,7 +124,7 @@ module Neko
         logger.info('Created basic auth header from URL')
       end
       data = send(req)
-      data = redirect(method, uri, params: params, body: body, query: query) if data.class <= URI::HTTP
+      data = redirect(method, uri: data, body: req.body) if data.class <= URI::HTTP
       return data
     end
 
@@ -180,23 +180,15 @@ module Neko
       return data
     end
 
-    def redirect(method, uri, params: nil, body: nil, query: nil)
+    def redirect(method, uri:, body: nil)
       if uri.host == init_uri.host && uri.port == init_uri.port
         logger.info("Local #{method.upcase} redirect, reusing HTTP session")
-        new_http = http
+        new_http = self
       else
         logger.info("External #{method.upcase} redirect, spawning new HTTP object")
         new_http = HTTP.new("#{uri.scheme}://#{uri.host}#{uri.path}", headers)
       end
-      case method
-      when :get, :delete
-        data = operate(method, uri, params: params, query: query)
-      when :put, :patch, :post
-        data = new_http.public_send(method, uri, params: params, body: body, query: query)
-      else
-        data = nil
-      end
-      return data
+      new_http.__send__(:operate, method, path: uri.path, body: body, query: uri.query)
     end
   end
 
