@@ -1,6 +1,6 @@
 # NekoHTTP - Pure Ruby HTTP client using net/http
 # 
-# v.20200430r
+# v.20200629
 
 require 'json'
 require 'logger'
@@ -25,15 +25,15 @@ module Neko
       delete: Net::HTTP::Delete
     }
 
-    def self.get(url, params)
-      h = HTTP.new(url)
+    def self.get(url, params, hdrs = nil)
+      h = HTTP.new(url, hdrs)
       data = h.get(params: params)
       h.close
       return data
     end
 
-    def self.post_form(url, params)
-      h = HTTP.new(url)
+    def self.post_form(url, params, hdrs = nil)
+      h = HTTP.new(url, hdrs)
       data = h.post(params: params)
       h.close
       return data
@@ -43,8 +43,10 @@ module Neko
     # It will set the Content-Type to application/json.
     # @param url [String] full URL string
     # @param obj [Array, Hash, String] Array/Hash will be converted to JSON
-    def self.post_json(url, obj)
-      h = HTTP.new(url, {'Content-Type' => 'application/json'})
+    # @param hdrs [Array, Hash, String] Array/Hash will be converted to JSON
+    def self.post_json(url, obj, hdrs = {})
+      hdrs['Content-Type'] = 'application/json'
+      h = HTTP.new(url, hdrs)
       case obj
       when Array, Hash
         body = JSON.fast_generate(obj)
