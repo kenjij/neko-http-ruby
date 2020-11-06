@@ -25,6 +25,11 @@ module Neko
       delete: Net::HTTP::Delete
     }
 
+    # Simple GET request
+    # @param url [String] full URL string
+    # @param params [Array, Hash] it will be converted to URL encoded query
+    # @param hdrs [Hash] HTTP headers
+    # @return [Hash] contains: :code, :headers, :body, :message
     def self.get(url, params, hdrs = nil)
       h = HTTP.new(url, hdrs)
       data = h.get(params: params)
@@ -32,6 +37,11 @@ module Neko
       return data
     end
 
+    # Send POST request with form data URL encoded body
+    # @param url [String] full URL string
+    # @param params [Array, Hash] it will be converted to URL encoded body
+    # @param hdrs [Hash] HTTP headers
+    # @return (see #self.get)
     def self.post_form(url, params, hdrs = nil)
       h = HTTP.new(url, hdrs)
       data = h.post(params: params)
@@ -43,7 +53,8 @@ module Neko
     # It will set the Content-Type to application/json.
     # @param url [String] full URL string
     # @param obj [Array, Hash, String] Array/Hash will be converted to JSON
-    # @param hdrs [Array, Hash, String] Array/Hash will be converted to JSON
+    # @param hdrs [Hash] HTTP headers
+    # @return (see #self.get)
     def self.post_json(url, obj, hdrs = {})
       hdrs['Content-Type'] = 'application/json'
       h = HTTP.new(url, hdrs)
@@ -63,6 +74,9 @@ module Neko
     attr_reader :init_uri, :http
     attr_accessor :logger, :headers
 
+    # Instance constructor for tailored use
+    # @param url [String] full URL string
+    # @param hdrs [Hash] HTTP headers
     def initialize(url, hdrs = nil)
       @logger = Neko.logger
       @init_uri = URI(url)
