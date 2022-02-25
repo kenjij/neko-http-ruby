@@ -25,7 +25,7 @@ Neko::HTTP.post_form('http://example.com/search', params)
 
 # POST request with JSON body and additional headers
 params = {name: {first: 'Ken', alias: 'KJ'}}
-headers = {'Authorization' => 'Bearer 12CDEF78'}
+headers = {'Authorization' => ['Bearer 12CDEF78']}
 Neko::HTTP.post_form('http://example.com/search', params, headers)
 ```
 

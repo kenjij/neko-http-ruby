@@ -1,13 +1,14 @@
+#
 # NekoHTTP - Pure Ruby HTTP client using net/http
-# 
-# v.20200629
-
+#
 require 'json'
 require 'logger'
 require 'net/http'
 require 'openssl'
 
 module Neko
+  VERSION = '20220224'.freeze
+
   def self.logger=(logger)
     @logger = logger
   end
